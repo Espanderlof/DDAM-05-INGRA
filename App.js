@@ -1,15 +1,23 @@
-import { StatusBar } from "expo-status-bar";
+import { Provider } from "react-redux";
 import { SafeAreaView } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
-import { LoginView } from "./src/views/LoginView";
 
+
+import { store } from './src/store/store';
+import { Navigator } from "./src/Navigator";
 
 export default function App() {
     return (
-        <PaperProvider>
-            <SafeAreaView style={{ flex: 1 }}>
-                <LoginView />
+        <PaperProvider> 
+            <SafeAreaView style={{ flex: 1 }}> 
+                <Provider store={ store }> 
+                    <Navigator />
+                </Provider>
             </SafeAreaView>
         </PaperProvider>
     );
 }
+
+{/* PaperProvider -> provider de react-native-paper- Permite configurar el tema de la app */}
+{/* SafeAreaView de react-native - Se utiliza para asegurarse de que el contenido de la app e renderice dentro de una zona segura de la pantalla del dispositivo */}
+{/* Provider  de react-redux - Es un componente de React Redux que proporciona una manera fácil de conectar la aplicación de React a la tienda de Redux */}
