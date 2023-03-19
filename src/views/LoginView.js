@@ -1,18 +1,32 @@
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Alert } from "react-native";
 import { Button, TextInput } from "react-native-paper";
+import { useDispatch } from "react-redux";
+import { login } from "../redux/store";
+import { auth, loginUser } from "../services/firebase";
 
-
-export const LoginView = () => {
+export const LoginView = ({navigation}) => {
+    const dispatch = useDispatch();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const handleLogin = () => {
-        console.log('btn login');
+        if (!email || !password) {
+            alert('Todos los campos son requeridos');
+            return;
+        }
+        loginUser(email, password)
+        .then((user) =>{
+            const token = user._tokenResponse.email;
+            dispatch(login({ token }));
+        })
+        .catch((error) => {
+            alert(`El usuario o la contraseña son incorrectos: ${error}`);
+        });
     };
 
     const handleSignUp = () => {
-        console.log('btn registra');
+        navigation.navigate('Register');
     };
 
     return (

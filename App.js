@@ -1,15 +1,14 @@
 import { Provider } from "react-redux";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, StyleSheet, StatusBar } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 
-
-import { store } from './src/store/store';
+import { store } from "./src/redux/store";
 import { Navigator } from "./src/Navigator";
 
 export default function App() {
     return (
         <PaperProvider> 
-            <SafeAreaView style={{ flex: 1 }}> 
+            <SafeAreaView style={[styles.container, { marginTop: StatusBar.currentHeight || 0 }]}>
                 <Provider store={ store }> 
                     <Navigator />
                 </Provider>
@@ -17,6 +16,13 @@ export default function App() {
         </PaperProvider>
     );
 }
+
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+});
 
 {/* PaperProvider -> provider de react-native-paper- Permite configurar el tema de la app */}
 {/* SafeAreaView de react-native - Se utiliza para asegurarse de que el contenido de la app e renderice dentro de una zona segura de la pantalla del dispositivo */}

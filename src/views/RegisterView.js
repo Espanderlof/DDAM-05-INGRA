@@ -1,18 +1,46 @@
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Alert } from "react-native";
 import { Button, TextInput } from "react-native-paper";
+import { auth, registerUser } from "../services/firebase";
 
-
-export const RegisterView = () => {
+export const RegisterView = ({navigation}) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
-    const handleLogin = () => {
-        console.log('btn login');
+    const handleRegister = () => {
+        if (!email || !password || !confirmPassword) {
+            alert('Todos los campos son requeridos');
+            return;
+        }
+        if (!/\S+@\S+\.\S+/.test(email)) {
+            alert('Por favor, introduzca una dirección de correo electrónico válida');
+            return;
+        }
+        if (password.length < 6) {
+            alert('La contraseña debe tener al menos 6 caracteres');
+            return;
+        }
+        if (password !== confirmPassword) {
+            alert('Las contraseñas no coinciden');
+            return;
+        }
+
+        registerUser(email, password)
+        .then(() =>{
+            Alert.alert(
+                '¡Correcto!',
+                'Usuario registrado con éxito',
+                [{ text: 'Aceptar', onPress: () => { navigation.navigate('Login'); } }]
+            );
+        })
+        .catch((error) => {
+            alert(`Error al registrar usuario: ${error}`);
+        });
     };
 
-    const handleSignUp = () => {
-        console.log('btn registra');
+    const handleVolver = () => {
+        navigation.navigate('Login');
     };
 
     return (
@@ -32,15 +60,24 @@ export const RegisterView = () => {
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
-                autoCompleteType="password"
+                autoCapitalize="none"
                 textContentType="password"
                 style={styles.input}
             />
-            <Button mode="contained" onPress={handleLogin} style={styles.button}>
-                Iniciar sesión
-            </Button>
-            <Button mode="outlined" onPress={handleSignUp} style={styles.button}>
+            <TextInput
+                label="Confirme Contraseña"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry
+                autoCapitalize="none"
+                textContentType="password"
+                style={styles.input}
+            />
+            <Button mode="contained" onPress={handleRegister} style={styles.button}>
                 Registrarme
+            </Button>
+            <Button mode="outlined" onPress={handleVolver} style={styles.button}>
+                Volver
             </Button>
         </View>
     )

@@ -1,14 +1,63 @@
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
-//import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 
 //views
 import { HomeView } from "./views/HomeView";
 import { ProfileView } from "./views/ProfileView";
+import { LoginView } from "./views/LoginView";
+import { RegisterView } from "./views/RegisterView"; 
 
 //icons
 import { Entypo, AntDesign } from '@expo/vector-icons';
 
+//redux
+import { useSelector } from "react-redux";
+
+const transitionConfig = {
+    // Configura la animación de transición
+    animation: 'spring',
+    config: {
+        stiffness: 500,
+        damping: 50,
+        mass: 3,
+        overshootClamping: true,
+        restDisplacementThreshold: 0.02,
+        restSpeedThreshold: 0.02,
+    },
+};
+
+const LoginStack = createNativeStackNavigator();
+const MyStack = (props) => {
+    return(
+        <LoginStack.Navigator
+            initialRouteName="Login"
+        >
+            <LoginStack.Screen
+                name="Login"
+                component={LoginView}
+                options={{
+                    headerShown: false,
+                    transitionSpec: {
+                        open: transitionConfig,
+                        close: transitionConfig,
+                    },
+                }}
+            />
+            <LoginStack.Screen
+                name="Register"
+                component={RegisterView}
+                options={{
+                    headerShown: false,
+                    transitionSpec: {
+                        open: transitionConfig,
+                        close: transitionConfig,
+                    },
+                }}
+            />
+        </LoginStack.Navigator>
+    )
+}
 
 const Tab = createMaterialBottomTabNavigator();
 const MyTabs = () => {
@@ -50,10 +99,18 @@ const MyTabs = () => {
     )
 }
 
+
+
 export const Navigator = () => {
+    const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+    console.log(useSelector(state => state.auth));
     return (
         <NavigationContainer>
-            <MyTabs/>
+            { !isAuthenticated ? (
+                <MyStack/>
+            ) : (
+                <MyTabs/>
+            )}
         </NavigationContainer>
     )
 }
