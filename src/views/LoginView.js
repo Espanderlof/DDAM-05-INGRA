@@ -2,8 +2,9 @@ import { useState } from "react";
 import { StyleSheet, View, Alert } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 import { useDispatch } from "react-redux";
-import { login } from "../redux/store";
+import { login } from "../redux/authSlice";
 import { auth, loginUser } from "../services/firebase";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const LoginView = ({navigation}) => {
     const dispatch = useDispatch();
@@ -16,9 +17,12 @@ export const LoginView = ({navigation}) => {
             return;
         }
         loginUser(email, password)
-        .then((user) =>{
-            const token = user._tokenResponse.email;
-            dispatch(login({ token }));
+        .then((respWS) =>{
+            const token = respWS._tokenResponse.email;
+            const uid = respWS.user.uid;
+            AsyncStorage.setItem('token', token);
+            AsyncStorage.setItem('uid', uid);
+            dispatch(login({ token, uid }));
         })
         .catch((error) => {
             alert(`El usuario o la contraseña son incorrectos: ${error}`);

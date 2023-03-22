@@ -102,11 +102,11 @@ const MyTabs = () => {
 
 
 export const Navigator = () => {
-    const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+    const status = useSelector(state => state.auth.status);
     console.log(useSelector(state => state.auth));
     return (
         <NavigationContainer>
-            { !isAuthenticated ? (
+            { (status != 'authenticated') ? (
                 <MyStack/>
             ) : (
                 <MyTabs/>
