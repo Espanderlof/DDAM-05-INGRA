@@ -9,6 +9,7 @@ import { HomeView } from "./views/HomeView";
 import { ProfileView } from "./views/ProfileView";
 import { LoginView } from "./views/LoginView";
 import { RegisterView } from "./views/RegisterView";
+import { FollowView } from "./views/FollowView";
 
 //icons
 import { Entypo, AntDesign } from '@expo/vector-icons';
@@ -16,6 +17,7 @@ import { Entypo, AntDesign } from '@expo/vector-icons';
 //redux
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "./redux/authSlice";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const transitionConfig = {
     // Configura la animación de transición
@@ -43,7 +45,7 @@ const LogoutTab = ({ navigation }) => {
                         text: 'No',
                         style: 'cancel',
                         onPress: () => {
-                            navigation.navigate('Profile');
+                            navigation.navigate('Profiles');
                         },
                     },
                     {
@@ -67,6 +69,7 @@ const LogoutTab = ({ navigation }) => {
 const LoginStack = createNativeStackNavigator();
 const MyStack = (props) => {
     return (
+        
         <LoginStack.Navigator
             initialRouteName="Login"
         >
@@ -96,6 +99,41 @@ const MyStack = (props) => {
     )
 }
 
+const ProfileStack = createNativeStackNavigator();
+const StackProfile = (props) => {
+    return (
+        <ProfileStack.Navigator
+            initialRouteName="Profile"
+            screenOptions={{
+                headerTitle: '',
+              }}
+        >
+            <ProfileStack.Screen
+                name="Profile"
+                component={ProfileView}
+                options={{
+                    headerShown: false,
+                    transitionSpec: {
+                        open: transitionConfig,
+                        close: transitionConfig,
+                    },
+                }}
+            />
+            <ProfileStack.Screen
+                name="Follow"
+                component={FollowView}
+                options={{
+                    //headerShown: false,
+                    transitionSpec: {
+                        open: transitionConfig,
+                        close: transitionConfig,
+                    },
+                }}
+            />
+        </ProfileStack.Navigator>
+    )
+}
+
 const Tab = createMaterialBottomTabNavigator();
 const MyTabs = () => {
     return (
@@ -119,8 +157,8 @@ const MyTabs = () => {
                 }}
             />
             <Tab.Screen
-                name="Profile"
-                component={ProfileView}
+                name="Profiles"
+                component={StackProfile}
                 //initialParams={{ listaTareas }}
                 //component={() => <TaskAdd navigation={navigation} />}
                 options={{

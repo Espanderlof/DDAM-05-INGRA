@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { StyleSheet, View, Alert } from "react-native";
+import { StyleSheet, View, Alert, SafeAreaView, StatusBar } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 import { auth, registerUser } from "../services/firebase";
 
-export const RegisterView = ({navigation}) => {
+export const RegisterView = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -27,16 +27,16 @@ export const RegisterView = ({navigation}) => {
         }
 
         registerUser(email, password)
-        .then(() =>{
-            Alert.alert(
-                '¡Correcto!',
-                'Usuario registrado con éxito',
-                [{ text: 'Aceptar', onPress: () => { navigation.navigate('Login'); } }]
-            );
-        })
-        .catch((error) => {
-            alert(`Error al registrar usuario: ${error}`);
-        });
+            .then(() => {
+                Alert.alert(
+                    '¡Correcto!',
+                    'Usuario registrado con éxito',
+                    [{ text: 'Aceptar', onPress: () => { navigation.navigate('Login'); } }]
+                );
+            })
+            .catch((error) => {
+                alert(`Error al registrar usuario: ${error}`);
+            });
     };
 
     const handleVolver = () => {
@@ -44,42 +44,44 @@ export const RegisterView = ({navigation}) => {
     };
 
     return (
-        <View style={styles.container}>
-            <TextInput
-                label="Correo electrónico"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCompleteType="email"
-                textContentType="emailAddress"
-                style={styles.input}
-            />
-            <TextInput
-                label="Contraseña"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                autoCapitalize="none"
-                textContentType="password"
-                style={styles.input}
-            />
-            <TextInput
-                label="Confirme Contraseña"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
-                autoCapitalize="none"
-                textContentType="password"
-                style={styles.input}
-            />
-            <Button mode="contained" onPress={handleRegister} style={styles.button}>
-                Registrarme
-            </Button>
-            <Button mode="outlined" onPress={handleVolver} style={styles.button}>
-                Volver
-            </Button>
-        </View>
+        <SafeAreaView style={[stylesSafeArea.container, { marginTop: StatusBar.currentHeight || 0 }]}>
+            <View style={styles.container}>
+                <TextInput
+                    label="Correo electrónico"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCompleteType="email"
+                    textContentType="emailAddress"
+                    style={styles.input}
+                />
+                <TextInput
+                    label="Contraseña"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
+                    autoCapitalize="none"
+                    textContentType="password"
+                    style={styles.input}
+                />
+                <TextInput
+                    label="Confirme Contraseña"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry
+                    autoCapitalize="none"
+                    textContentType="password"
+                    style={styles.input}
+                />
+                <Button mode="contained" onPress={handleRegister} style={styles.button}>
+                    Registrarme
+                </Button>
+                <Button mode="outlined" onPress={handleVolver} style={styles.button}>
+                    Volver
+                </Button>
+            </View>
+        </SafeAreaView>
     )
 }
 
@@ -95,5 +97,10 @@ const styles = StyleSheet.create({
     },
     button: {
         marginBottom: 16,
+    },
+});
+const stylesSafeArea = StyleSheet.create({
+    container: {
+        flex: 1,
     },
 });
