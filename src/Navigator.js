@@ -10,9 +10,10 @@ import { ProfileView } from "./views/ProfileView";
 import { LoginView } from "./views/LoginView";
 import { RegisterView } from "./views/RegisterView";
 import { FollowView } from "./views/FollowView";
+import { AddPhotoView } from "./views/AddPhotoView";
 
 //icons
-import { Entypo, AntDesign } from '@expo/vector-icons';
+import { Entypo, AntDesign, MaterialIcons } from '@expo/vector-icons';
 
 //redux
 import { useDispatch, useSelector } from "react-redux";
@@ -168,6 +169,19 @@ const MyTabs = () => {
                         <AntDesign name="profile" size={24} color={color} />
                     ),
                     //headerShown: false,
+                }}
+            />
+            <Tab.Screen
+                name="AddView"
+                component={AddPhotoView}
+                //initialParams={{ listaTareas }}
+                options={{
+                    tabBarLabel: 'Add Photo',
+                    tabBarIcon: ({ color, size }) => (
+                        <MaterialIcons name="add-a-photo" size={24} color={color} />
+                    ),
+                    //tabBarBadge: 0,
+                    headerShown: false,
                 }}
             />
             <Tab.Screen
