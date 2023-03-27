@@ -2246,6 +2246,11 @@
     opencollective-postinstall "^2.0.1"
     superstruct "^0.6.2"
 
+"@react-native-firebase/storage@^17.4.0":
+  version "17.4.0"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/storage/-/storage-17.4.0.tgz#6ca5198b8af3b5a5b1e9a40f05bc357080d58afe"
+  integrity sha512-hmaL+I0H3HMu00b5vZJfPydCjFsn8cdDU/goShnlTx8XWdB9SVyDbRuEIHRc0NjEFwqXlmIZxk8yLyziAkTlkQ==
+
 "@react-native/assets@1.0.0":
   version "1.0.0"
   resolved "https://registry.npmjs.org/@react-native/assets/-/assets-1.0.0.tgz"
@@ -3997,7 +4002,7 @@ find-yarn-workspace-root@~2.0.0:
 
 firebase@^9.18.0:
   version "9.18.0"
-  resolved "https://registry.npmjs.org/firebase/-/firebase-9.18.0.tgz"
+  resolved "https://registry.yarnpkg.com/firebase/-/firebase-9.18.0.tgz#c617c8194baa7683b6da24d05e613eadc6ab7e32"
   integrity sha512-CTV5S3mTtn9zodeWkdeTqiQFyS7t+iskA50V9hVKPCQ4TPw4tnoyNgtNzWUmemFnYadzzsTnAaxsR7UaBJgiqw==
   dependencies:
     "@firebase/analytics" "0.9.4"

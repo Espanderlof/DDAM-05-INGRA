@@ -1,14 +1,19 @@
 import { useState } from 'react';
-import { View, StyleSheet, Image, TextInput, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
+import { View, StyleSheet, Image, TextInput, TouchableOpacity, SafeAreaView, StatusBar, Alert } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
+import { useSelector } from "react-redux";
+import { createPublication, uploadImageToFirebase } from "../services/firebase";
 
 export const AddPhotoView = () => {
     const [image, setImage] = useState(null);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
+
+    const authEmail = useSelector(state => state.auth.token);
+    const authUid = useSelector(state => state.auth.uid);
 
     const requestCameraPermissions = async () => {
         const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
@@ -31,31 +36,59 @@ export const AddPhotoView = () => {
     };
 
     const handleTakePhoto = async () => {
-        const hasPermissions = await requestCameraPermissions();
+        alert('La funcionalidad del uso de la cámara se encuentra indisponible, ya que se encontró un error en la librería de expo.');
+        return;
+        // const hasPermissions = await requestCameraPermissions();
 
-        if (!hasPermissions) {
-            alert('Se requieren permisos de cámara y galería para tomar fotos.');
-            return;
-        }
+        // if (!hasPermissions) {
+        //     alert('Se requieren permisos de cámara y galería para tomar fotos.');
+        //     return;
+        // }
 
-        const result = await ImagePicker.launchCameraAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
+        // const result = await ImagePicker.launchCameraAsync({
+        //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        //     allowsEditing: true,
+        //     aspect: [4, 3],
+        //     quality: 1,
+        // });
 
-        if (result && !result.canceled) {
-            setImage(result.assets[0]);
+        // if (result && !result.canceled) {
+        //     setImage(result.assets[0]);
+        // }
+    };
+
+    const handleSubmit = async () => {
+        try {
+            // Sube la imagen al storage de Firebase y obtén la URL de la imagen
+            const imageUrl = await uploadImageToFirebase(image);
+
+            if (imageUrl) {
+                const publicationData = {
+                    titulo: title,
+                    descripcion: description,
+                    publicationDate: new Date(),
+                    urlImagen: imageUrl
+                };
+                await createPublication(authUid, publicationData);
+
+                Alert.alert(
+                    '¡Correcto!',
+                    'Publicación creada con éxito',
+                    [{ text: 'Aceptar', onPress: () => { 
+                        setImage(null);
+                        setTitle('');
+                        setDescription('');
+                     } }]
+                );
+            } else {
+                console.error('Error subiendo la imagen a Firebase');
+            }
+        } catch (error) {
+            console.error("Error al crear la publicación:", error);
         }
     };
 
-    const handleSubmit = () => {
-        // Lógica para guardar la imagen, el título y la descripción en el servidor o almacenamiento local
-        console.log('Image:', image);
-        console.log('Title:', title);
-        console.log('Description:', description);
-    };
+
 
     return (
         <SafeAreaView style={[stylesSafeArea.container, { marginTop: StatusBar.currentHeight || 0 }]}>

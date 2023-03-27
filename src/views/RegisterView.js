@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { StyleSheet, View, Alert, SafeAreaView, StatusBar } from "react-native";
 import { Button, TextInput } from "react-native-paper";
-import { auth, registerUser } from "../services/firebase";
+import { auth, registerUser, saveProfile, deleteUser } from "../services/firebase";
 
 export const RegisterView = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         if (!email || !password || !confirmPassword) {
             alert('Todos los campos son requeridos');
             return;
@@ -26,17 +26,37 @@ export const RegisterView = ({ navigation }) => {
             return;
         }
 
-        registerUser(email, password)
-            .then(() => {
+        try {
+            const user = await registerUser(email, password);
+            const userId = user.uid;
+            let profileName = email.split('@')[0];
+            profileName = profileName.charAt(0).toUpperCase() + profileName.slice(1);
+
+            const profileData = {
+                name: profileName,
+                username: email,
+                profileImage: "https://via.placeholder.com/150x150.png?text=Profile",
+                dateRegistration: new Date(),
+                followingData: []
+            };
+
+            try {
+                await saveProfile(userId, profileData);
                 Alert.alert(
                     '¡Correcto!',
                     'Usuario registrado con éxito',
                     [{ text: 'Aceptar', onPress: () => { navigation.navigate('Login'); } }]
                 );
-            })
-            .catch((error) => {
-                alert(`Error al registrar usuario: ${error}`);
-            });
+            } catch (error) {
+                console.error(`Error al guardar el perfil: ${error}`);
+                // Eliminar el usuario si falla el guardado del perfil
+                await deleteUser(user);
+                alert('Error al guardar el perfil, por favor intente de nuevo.');
+            }
+        } catch (error) {
+            console.error(`Error al registrar usuario: ${error}`);
+            alert('Error al registrar usuario, por favor intente de nuevo.');
+        }
     };
 
     const handleVolver = () => {
