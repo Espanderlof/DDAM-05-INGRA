@@ -36,25 +36,33 @@ export const AddPhotoView = () => {
     };
 
     const handleTakePhoto = async () => {
-        alert('La funcionalidad del uso de la cámara se encuentra indisponible, ya que se encontró un error en la librería de expo.');
-        return;
-        // const hasPermissions = await requestCameraPermissions();
+        try {
+            //alert('La funcionalidad del uso de la cámara se encuentra indisponible, ya que se encontró un error en la librería de expo.'); return;
+            const permission = await ImagePicker.requestCameraPermissionsAsync();
 
-        // if (!hasPermissions) {
-        //     alert('Se requieren permisos de cámara y galería para tomar fotos.');
-        //     return;
-        // }
+            if (!permission.granted) {
+                alert('Se requieren permisos de cámara y galería para tomar fotos.');
+                return;
+            }
 
-        // const result = await ImagePicker.launchCameraAsync({
-        //     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        //     allowsEditing: true,
-        //     aspect: [4, 3],
-        //     quality: 1,
-        // });
+            const result = await ImagePicker.launchCameraAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 1,
+            });
 
-        // if (result && !result.canceled) {
-        //     setImage(result.assets[0]);
-        // }
+            if (result && !result.canceled) {
+                console.log("foto correcta");
+                setImage(result.assets[0]);
+            } else {
+                console.log("foto cancelada");
+                return
+            }
+        } catch (error) {
+            console.log(error);
+        }
+
     };
 
     const handleSubmit = async () => {
@@ -74,11 +82,13 @@ export const AddPhotoView = () => {
                 Alert.alert(
                     '¡Correcto!',
                     'Publicación creada con éxito',
-                    [{ text: 'Aceptar', onPress: () => { 
-                        setImage(null);
-                        setTitle('');
-                        setDescription('');
-                     } }]
+                    [{
+                        text: 'Aceptar', onPress: () => {
+                            setImage(null);
+                            setTitle('');
+                            setDescription('');
+                        }
+                    }]
                 );
             } else {
                 console.error('Error subiendo la imagen a Firebase');
