@@ -36,19 +36,21 @@ El proyecto al final consistirá en los siguientes entregables:
 
 # Milestones
 
+Los Milestone 1 y Milestone 2 se revisarán en la clase grupo por grupo, con el objetivo de tener el feedback correspondiente el mismo día.
+
 ## Milestone 1: Arquitectura y Modelo de datos
 
 En este primer entregable se espera tener definido la primera version de el modelo de datos y la arquitectura de la aplicación. En ambos casos es suficiente que entreguen diagramas pero deben ser claros.
 
 Igualmente en este primer entregable se espera tener al menos el bosquejo inicial de la aplicación y el manejo de usuarios (Registro + Inicio de Sesión)
 
-Se abrirá una tarea en la plataforma donde se podrá subir todos los entregables, la fecha de entrega de este Milestone es el 15 de Marzo del 2023, hasta las 23:59 horas
+La entrega de este Milestone es el Milestone es el 20 de Marzo del 2023, la revisión se hará en la misma clase. Igualmente se abrirá una tarea en la plataforma donde se podrá subir todos los entregables hasta las 23:59 horas
 
 ## Milestone 2: Manejo de imagenes y publicaciones
 
 Para este segundo entregable se espera tener la funcionalidad de Subir imagenes y que se puedan visualizar dichas imagenes por el usuario en la aplicación. En caso de que existan cambios tanto en la arquitectura, como en el modelo de datos, deben actualizar sus diagramas.
 
-Tal como en el anterior milestone, se abrirá una tarea en la plataforma donde se podrá subir todos los entregables. La fecha de entrega de este Milestone es el 27 de Marzo del 2023, hasta las 23:59 horas
+La entrega de este Milestone es el 27 de Marzo del 2023, hasta las 23:59 horas. Tal como en el anterior milestone, la revisión se hará en la misma clase. Igualmente se abrirá una tarea en la plataforma donde se podrá subir todos los entregables hasta las 23:59 horas. se abrirá una tarea en la plataforma donde se podrá subir todos los entregables. 
 
 ## Milestone 3: Interacción entre usuarios
 
@@ -56,5 +58,5 @@ Para este segundo entregable se espera tener la funcionalidad de Seguimiento de 
 
 Igualmente en este Milestone podrán agregar las funcionalidades extra que se encuentran definidas. Cada funcionalidad extra implementada se contabilizará como 0.5 puntos extra a la nota final.
 
-Tal como en el anterior milestone, se abrirá una tarea en la plataforma donde se podrá subir todos los entregables. La fecha de entrega de este Milestone es el 03 de Abril del 2023, hasta las 23:59 horas
+Para este milestone, solamente se abrirá una tarea en la plataforma donde se podrá subir todos los entregables. La fecha de entrega de este Milestone es el 03 de Abril del 2023, hasta las 23:59 horas
 
