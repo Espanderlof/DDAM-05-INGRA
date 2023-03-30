@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { View, StyleSheet, Image, FlatList, TouchableOpacity, Modal, SafeAreaView, StatusBar, ActivityIndicator, RefreshControl } from 'react-native';
-import { Avatar, Title, Text, Caption, Paragraph, Divider, IconButton } from 'react-native-paper';
+import { Avatar, Title, Text, Caption, Paragraph, IconButton, Button } from 'react-native-paper';
 import { useSelector } from "react-redux";
-import { getProfile, getPublicationsByUser } from "../services/firebase";
+import { addFollower, followUser, getProfile, getPublicationsByUser, removeFollower, unfollowUser } from "../services/firebase";
 
-export const ProfileView = ({ navigation }) => {
+export const ProfileDetView = ({ navigation, route }) => {
     const [refreshing, setRefreshing] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
@@ -15,16 +15,17 @@ export const ProfileView = ({ navigation }) => {
         "siguiendo": 0,
     });
     const [dataPublic, setDataPublic] = useState([]);
+    const [isFollowing, setIsFollowing] = useState(false);
 
     const authEmail = useSelector(state => state.auth.token);
     const authUid = useSelector(state => state.auth.uid);
+    const { profileId } = route.params;
 
     const loadProfile = async () => {
-        if (authUid != '') {
-            const userId = authUid;
-            const profileData = await getProfile(userId);
+        if (profileId != '') {
+            const profileData = await getProfile(profileId);
             setDataUser(profileData);
-            const publicationsData = await getPublicationsByUser(userId);
+            const publicationsData = await getPublicationsByUser(profileId);
             setDataPublic(publicationsData);
             const publicaciones = publicationsData ? publicationsData.length : 0;
             const seguidores = profileData.followersData ? profileData.followersData.length : 0;
@@ -34,7 +35,14 @@ export const ProfileView = ({ navigation }) => {
                 "publicaciones": publicaciones,
                 "seguidores": seguidores,
                 "siguiendo": siguiendo,
+
             });
+
+            const isUserFollowing = profileData.followersData.some(
+                (follower) => follower.id === authUid
+            );
+            setIsFollowing(isUserFollowing);
+
             setRefreshing(false);
         } else {
             console.log("No hay un usuario autenticado");
@@ -76,7 +84,7 @@ export const ProfileView = ({ navigation }) => {
     );
 
     const handleFollowPress = (title, oldview, data, user) => {
-        navigation.navigate('Follow', {
+        navigation.navigate('ProfileDetFollow', {
             title,
             oldview,
             data,
@@ -91,6 +99,29 @@ export const ProfileView = ({ navigation }) => {
         </View>
     );
 
+    const handleFollowButtonPress = async () => {
+        try {
+
+            if (!isFollowing) {
+                await followUser(authUid, profileId, dataUser.username);
+                await addFollower(profileId, authUid, authEmail);
+            } else {
+                await unfollowUser(authUid, profileId, dataUser.username);
+                await removeFollower(profileId, authUid, authEmail);
+            }
+
+            setProfileCounts((prevState) => {
+                const updatedFollowers = isFollowing ? prevState.seguidores - 1 : prevState.seguidores + 1;
+                return { ...prevState, seguidores: updatedFollowers };
+            });
+
+            setIsFollowing(!isFollowing);
+        } catch (error) {
+            console.error('Error: ', error);
+            return null;
+        }
+    };
+
     if (!dataUser) {
         return (
             <SafeAreaView style={[stylesSafeArea.container, { marginTop: StatusBar.currentHeight || 0 }]}>
@@ -101,7 +132,7 @@ export const ProfileView = ({ navigation }) => {
             </SafeAreaView>
         );
     }
-    //console.log( dataPublic.length );
+    //console.log( dataUser );
     return (
         <SafeAreaView style={[stylesSafeArea.container, { marginTop: StatusBar.currentHeight || 0 }]}>
             <View style={styles.container}>
@@ -119,14 +150,14 @@ export const ProfileView = ({ navigation }) => {
                             <Caption>Publicaciones</Caption>
                         </Paragraph>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => handleFollowPress('Seguidores', 'Profile', dataUser.followersData, { userId: authUid, userEmail: authEmail })}>
+                    <TouchableOpacity onPress={() => handleFollowPress('Seguidores', 'ProfileDet', dataUser.followersData, { userId: profileId, userEmail: dataUser.username } )}>
                         <Paragraph style={styles.stat}>
                             <Text style={styles.statNumber}>{profileCounts.seguidores}</Text>
                             {'\n'}
                             <Caption>Seguidores</Caption>
                         </Paragraph>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => handleFollowPress('Siguiendo', 'Profile', dataUser.followingData, { userId: authUid, userEmail: authEmail })}>
+                    <TouchableOpacity onPress={() => handleFollowPress('Siguiendo',  'ProfileDet', dataUser.followingData, { userId: profileId, userEmail: dataUser.username } )}>
                         <Paragraph style={styles.stat}>
                             <Text style={styles.statNumber}>{profileCounts.siguiendo}</Text>
                             {'\n'}
@@ -134,6 +165,14 @@ export const ProfileView = ({ navigation }) => {
                         </Paragraph>
                     </TouchableOpacity>
                 </View>
+
+                <Button
+                    mode="contained"
+                    onPress={handleFollowButtonPress}
+                    style={styles.followButton(isFollowing)}
+                >
+                    {isFollowing ? 'Dejar de seguir' : 'Seguir'}
+                </Button>
 
                 <FlatList
                     data={dataPublic}
@@ -251,6 +290,13 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'gray',
     },
+    followButton: (isFollowing) => ({
+        marginTop: 0,
+        marginBottom: 10,
+        backgroundColor: isFollowing ? 'gray' : 'purple',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+    }),
 });
 
 const stylesSafeArea = StyleSheet.create({

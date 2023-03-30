@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
-import { Alert } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 
 //views
 import { HomeView } from "./views/HomeView";
@@ -11,6 +11,7 @@ import { LoginView } from "./views/LoginView";
 import { RegisterView } from "./views/RegisterView";
 import { FollowView } from "./views/FollowView";
 import { AddPhotoView } from "./views/AddPhotoView";
+import { ProfileDetView } from "./views/ProfileDetView";
 
 //icons
 import { Entypo, AntDesign, MaterialIcons } from '@expo/vector-icons';
@@ -18,7 +19,6 @@ import { Entypo, AntDesign, MaterialIcons } from '@expo/vector-icons';
 //redux
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "./redux/authSlice";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const transitionConfig = {
     // Configura la animación de transición
@@ -135,6 +135,52 @@ const StackProfile = (props) => {
     )
 }
 
+const HomeStack = createNativeStackNavigator();
+const StackHome = (props) => {
+    return (
+        <HomeStack.Navigator
+            initialRouteName="Home"
+            screenOptions={{
+                headerTitle: '',
+              }}
+        >
+            <HomeStack.Screen
+                name="Home"
+                component={HomeView}
+                options={{
+                    headerShown: false,
+                    transitionSpec: {
+                        open: transitionConfig,
+                        close: transitionConfig,
+                    },
+                }}
+            />
+            <HomeStack.Screen
+                name="ProfileDet"
+                component={ProfileDetView}
+                options={{
+                    //headerShown: false,
+                    transitionSpec: {
+                        open: transitionConfig,
+                        close: transitionConfig,
+                    },
+                }}
+            />
+            <HomeStack.Screen
+                name="ProfileDetFollow"
+                component={FollowView}
+                options={{
+                    //headerShown: false,
+                    transitionSpec: {
+                        open: transitionConfig,
+                        close: transitionConfig,
+                    },
+                }}
+            />
+        </HomeStack.Navigator>
+    )
+}
+
 const Tab = createMaterialBottomTabNavigator();
 const MyTabs = () => {
     return (
@@ -146,7 +192,7 @@ const MyTabs = () => {
         >
             <Tab.Screen
                 name="HomeView"
-                component={HomeView}
+                component={StackHome}
                 //initialParams={{ listaTareas }}
                 options={{
                     tabBarLabel: 'Home',
@@ -199,8 +245,9 @@ const MyTabs = () => {
 }
 
 export const Navigator = () => {
-    const status = useSelector(state => state.auth.status);
+    const status = useSelector(state => state.auth.status);    
     console.log(useSelector(state => state.auth));
+
     return (
         <NavigationContainer>
             {(status != 'authenticated') ? (
@@ -211,3 +258,23 @@ export const Navigator = () => {
         </NavigationContainer>
     )
 }
+
+const stylesSafeArea = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+});
+
+const stylesLoad = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    text: {
+        marginTop: 10,
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#6200ee',
+    },
+});

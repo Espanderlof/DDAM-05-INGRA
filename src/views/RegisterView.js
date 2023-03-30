@@ -37,7 +37,8 @@ export const RegisterView = ({ navigation }) => {
                 username: email,
                 profileImage: "https://via.placeholder.com/150x150.png?text=Profile",
                 dateRegistration: new Date(),
-                followingData: []
+                followingData: [],
+                followersData: []
             };
 
             try {

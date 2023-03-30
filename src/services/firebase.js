@@ -1,8 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, currentUser, deleteUser as fbDeleteUser } from "firebase/auth";
-import { getFirestore, collection, doc, setDoc, getDoc, addDoc, getDocs, query, where } from "firebase/firestore";
+import { getFirestore, collection, doc, setDoc, getDoc, addDoc, getDocs, query, where, orderBy, arrayUnion, arrayRemove, updateDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-
 
 const firebaseConfig = {
     apiKey: "AIzaSyCB4fyVo5lAfHw93OFly-leCqXwe6fVz38",
@@ -67,13 +66,55 @@ const createPublication = async (userId, publicationData) => {
 
 const getPublicationsByUser = async (userId) => {
     const publicationRef = collection(firestore, "Publicacion");
-    const q = query(publicationRef, where("usuario", "==", userId));
+    const q = query(publicationRef, where("usuario", "==", userId), orderBy("publicationDate", "desc"));
     const querySnapshot = await getDocs(q);
     const publications = [];
 
     querySnapshot.forEach((doc) => {
         publications.push({ id: doc.id, ...doc.data() });
     });
+    return publications;
+};
+
+const getAllPublications = async () => {
+    const publicationRef = collection(firestore, "Publicacion");
+    const q = query(publicationRef, orderBy("publicationDate", "desc"));
+    const querySnapshot = await getDocs(q);
+    const publications = [];
+
+    querySnapshot.forEach((doc) => {
+        publications.push({ id: doc.id, ...doc.data() });
+    });
+
+    return publications;
+};
+
+const getProfileById = async (userId) => {
+    const profileDoc = await getDoc(doc(firestore, "Profile", userId));
+    if (profileDoc.exists()) {
+        return { id: profileDoc.id, ...profileDoc.data() };
+    } else {
+        return null;
+    }
+};
+
+const getPublicationsWithProfile = async () => {
+    const publicationRef = collection(firestore, "Publicacion");
+    const q = query(publicationRef, orderBy("publicationDate", "desc"));
+    const querySnapshot = await getDocs(q);
+    const publications = [];
+
+    for (const doc of querySnapshot.docs) {
+        const publicationData = doc.data();
+        const profile = await getProfileById(publicationData.usuario);
+        if (profile) {
+            publications.push({
+                id: doc.id,
+                ...publicationData,
+                profile,
+            });
+        }
+    }
     return publications;
 };
 
@@ -128,6 +169,38 @@ const uploadImageToFirebase = async (image) => {
     }
 };
 
+const followUser = async (currentUserId, userIdToFollow, usernameToFollow) => {
+    const currentUserProfileRef = doc(firestore, "Profile", currentUserId);
+    const followingDataItem = { id: userIdToFollow, name: usernameToFollow };
+    await updateDoc(currentUserProfileRef, {
+        followingData: arrayUnion(followingDataItem),
+    });
+};
+
+const unfollowUser = async (currentUserId, userIdToUnfollow, usernameToUnfollow) => {
+    const currentUserProfileRef = doc(firestore, "Profile", currentUserId);
+    const followingDataItem = { id: userIdToUnfollow, name: usernameToUnfollow };
+    await updateDoc(currentUserProfileRef, {
+        followingData: arrayRemove(followingDataItem),
+    });
+};
+
+const addFollower = async (userId, followerId, followerName) => {
+    const userProfileRef = doc(firestore, "Profile", userId);
+    const followersDataItem = { id: followerId, name: followerName };
+    await updateDoc(userProfileRef, {
+        followersData: arrayUnion(followersDataItem),
+    });
+};
+
+const removeFollower = async (userId, followerId, followerName) => {
+    const userProfileRef = doc(firestore, "Profile", userId);
+    const followersDataItem = { id: followerId, name: followerName };
+    await updateDoc(userProfileRef, {
+        followersData: arrayRemove(followersDataItem),
+    });
+};
+
 export {
     auth,
     registerUser,
@@ -139,5 +212,11 @@ export {
     getProfile,
     createPublication,
     getPublicationsByUser,
-    uploadImageToFirebase
+    uploadImageToFirebase,
+    getAllPublications,
+    getPublicationsWithProfile,
+    followUser,
+    unfollowUser,
+    addFollower,
+    removeFollower
 };

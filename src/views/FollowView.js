@@ -1,37 +1,39 @@
 import { useState } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
 import { Avatar, Title, Text, IconButton } from 'react-native-paper';
+import { removeFollower, unfollowUser } from '../services/firebase';
 
-const FollowItem = ({ item, onDelete }) => {
-    return (
+export const FollowView = ({ route }) => {
+    const { title, oldview, userId, userEmail } = route.params;
+    const [data, setData] = useState(route.params.data);
+    console.log(title, userId, userEmail, data);
+
+    const handleDelete = async (itemToDelete) => {
+        try {
+            await unfollowUser(userId, itemToDelete.id, itemToDelete.name);
+            await removeFollower(itemToDelete.id, userId, userEmail);
+
+            setData(data.filter(item => item !== itemToDelete));
+        } catch (error) {
+            console.error('Error: ', error);
+            return null;
+        }
+    };
+
+    const renderItem = ({ item }) => (
         <View style={styles.item}>
             <Avatar.Image source={{ uri: 'https://via.placeholder.com/50x50.png?text=Avatar' }} size={50} />
             <View style={styles.itemText}>
                 <Title>{item.name}</Title>
-                <Text>{item.username}</Text>
             </View>
-            <IconButton
-                icon="close"
-                size={20}
-                onPress={() => onDelete(item)}
-            />
-        </View>
-    );
-};
-
-export const FollowView = ({ route }) => {
-    //const { title, data } = route.params;
-    const [data, setData] = useState(route.params.data);
-
-    const handleDelete = (itemToDelete) => {
-        setData(data.filter(item => item !== itemToDelete));
-    };
-
-    const renderItem = ({ item }) => (
-        <FollowItem
-            item={item}
-            onDelete={handleDelete}
-        />
+            {title === 'Siguiendo' && oldview === 'Profile' && (
+                <IconButton
+                    icon="close"
+                    size={20}
+                    onPress={() => handleDelete(item)}
+                />
+            )}            
+        </View>        
     );
 
     return (
@@ -41,6 +43,11 @@ export const FollowView = ({ route }) => {
                     data={data}
                     renderItem={renderItem}
                     keyExtractor={(item, index) => index.toString()}
+                    ListEmptyComponent={() => (
+                        <View style={styles.emptyContainer}>
+                            <Text style={styles.emptyText}>No tengo información</Text>
+                        </View>
+                    )}
                 />
             </View>
         </SafeAreaView>
@@ -60,6 +67,15 @@ const styles = StyleSheet.create({
     itemText: {
         marginLeft: 15,
         flex: 1,
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    emptyText: {
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });
 
