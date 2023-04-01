@@ -12,6 +12,7 @@ import { RegisterView } from "./views/RegisterView";
 import { FollowView } from "./views/FollowView";
 import { AddPhotoView } from "./views/AddPhotoView";
 import { ProfileDetView } from "./views/ProfileDetView";
+import { ComentariosView } from "./views/ComentariosView";
 
 //icons
 import { Entypo, AntDesign, MaterialIcons } from '@expo/vector-icons';
@@ -169,6 +170,17 @@ const StackHome = (props) => {
             <HomeStack.Screen
                 name="ProfileDetFollow"
                 component={FollowView}
+                options={{
+                    //headerShown: false,
+                    transitionSpec: {
+                        open: transitionConfig,
+                        close: transitionConfig,
+                    },
+                }}
+            />
+            <HomeStack.Screen
+                name="ComentariosSolo"
+                component={ComentariosView}
                 options={{
                     //headerShown: false,
                     transitionSpec: {

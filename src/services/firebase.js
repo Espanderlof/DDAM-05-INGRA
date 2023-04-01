@@ -201,6 +201,38 @@ const removeFollower = async (userId, followerId, followerName) => {
     });
 };
 
+const addComment = async (publicationId, comment, userId, userName, userEmail) => {
+    const publicationRef = doc(firestore, "Publicacion", publicationId);
+    const commentData = {
+        fecha: new Date(),
+        comentario: comment,
+        idUsuario: userId,
+        nameUsuario: userName,
+        correoUsuario: userEmail
+    };
+    await updateDoc(publicationRef, {
+        comentarios: arrayUnion(commentData),
+    });
+};
+
+const removeComment = async (publicationId, commentData) => {
+    const publicationRef = doc(firestore, "Publicacion", publicationId);
+    await updateDoc(publicationRef, {
+        comentarios: arrayRemove(commentData),
+    });
+};
+
+const getPublicationById = async (publicationId) => {
+    const publicationRef = doc(firestore, "Publicacion", publicationId);
+    const publicationDoc = await getDoc(publicationRef);
+
+    if (publicationDoc.exists()) {
+        return { id: publicationDoc.id, ...publicationDoc.data() };
+    } else {
+        return null;
+    }
+};
+
 export {
     auth,
     registerUser,
@@ -218,5 +250,8 @@ export {
     followUser,
     unfollowUser,
     addFollower,
-    removeFollower
+    removeFollower,
+    addComment,
+    removeComment,
+    getPublicationById
 };

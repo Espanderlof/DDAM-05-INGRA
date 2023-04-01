@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, SafeAreaView, StatusBar, View, ScrollView, Image, RefreshControl, ActivityIndicator, TouchableWithoutFeedback } from "react-native";
-import { Card, IconButton, Avatar, Text } from "react-native-paper";
+import { Card, IconButton, Avatar, Text, Title, Paragraph } from "react-native-paper";
 import { getPublicationsWithProfile } from "../services/firebase";
 import { useSelector } from "react-redux";
+import moment from 'moment';
 
-
-const Post = ({ urlImagen, profile, navigateToProfile }) => {
+const Post = ({ id, urlImagen, profile, navigateToProfile, publicationDate, titulo, descripcion, navigateToComentarios }) => {
     //console.log(profile.id);
+    const date = convertTimestampToDate(publicationDate);
+    const formattedDate = moment(date).fromNow();
     return (
         <Card style={styles.card}>
             <Card.Title
@@ -18,13 +20,24 @@ const Post = ({ urlImagen, profile, navigateToProfile }) => {
             />
             <Card.Content>
                 <Image source={{ uri: urlImagen }} style={styles.image} />
+                <Title style={styles.postTitle}>{titulo}</Title>
+                <Paragraph style={styles.postDetails}>{descripcion}</Paragraph>
             </Card.Content>
             <Card.Actions style={styles.actions}>
-                <IconButton icon="heart-outline" />
-                <IconButton icon="comment-outline" />
+                <IconButton
+                    icon="comment-outline"
+                    onPress={() => navigateToComentarios(id)}
+                />
+                <Text style={styles.dateText}>{formattedDate}</Text>
             </Card.Actions>
         </Card>
     );
+};
+
+const convertTimestampToDate = (timestamp) => {
+    const { seconds, nanoseconds } = timestamp;
+    const milliseconds = seconds * 1000 + nanoseconds / 1000000;
+    return new Date(milliseconds);
 };
 
 export const HomeView = ({ navigation }) => {
@@ -41,9 +54,14 @@ export const HomeView = ({ navigation }) => {
     const navigateToProfile = (profileId) => {
         if (authUid === profileId) {
             navigation.navigate('Profiles');
-        }else{
+        } else {
             navigation.navigate('ProfileDet', { profileId });
         }
+    };
+
+    const navigateToComentarios = (publicationId) => {
+        //console.log(publicationId)
+        navigation.navigate('ComentariosSolo', { publicationId });
     };
 
     useEffect(() => {
@@ -80,7 +98,7 @@ export const HomeView = ({ navigation }) => {
                     }
                 >
                     {dataPublic.map((dataPublic, index) => (
-                        <Post key={index} {...dataPublic} navigateToProfile={navigateToProfile} />
+                        <Post key={index} {...dataPublic} navigateToProfile={navigateToProfile} navigateToComentarios={navigateToComentarios} />
                     ))}
                 </ScrollView>
             </View>
@@ -104,6 +122,22 @@ const styles = StyleSheet.create({
     actions: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+    },
+    postTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginTop: 10,
+    },
+    postDetails: {
+        fontSize: 14,
+        marginTop: 4,
+    },
+    dateText: {
+        position: 'absolute',
+        left: 0,
+        bottom: 0,
+        fontSize: 12,
+        color: '#888',
     },
 });
 

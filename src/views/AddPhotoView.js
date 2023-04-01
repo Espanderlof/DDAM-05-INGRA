@@ -74,6 +74,7 @@ export const AddPhotoView = () => {
                 const publicationData = {
                     titulo: title,
                     descripcion: description,
+                    comentarios: [],
                     publicationDate: new Date(),
                     urlImagen: imageUrl
                 };
